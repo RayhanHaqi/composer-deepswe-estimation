@@ -14,3 +14,5 @@ Files:
 - `summary.json` — central estimate, method spread, overlap count
 - `estimates.csv` — per-method Composer DeepSWE pass-rate estimates
 - `overlap_pairs.csv` — matched CursorBench ↔ DeepSWE pairs used for linking
+- `loo_validation.csv` — per-pair, per-method held-out recovery errors
+- `loo_validation_summary.json` — committed LOO diagnostic summary (mean absolute error by method)

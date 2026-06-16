@@ -8,8 +8,8 @@ This file documents the public CursorBench reference table used to anchor Compos
 | SHA-256 | `604a0e35efc046aa4163b4c8035adb62975ee180d2f73ad4cda3c3aa8b4894f9` |
 | Size (bytes) | 1603 |
 | Captured date | 2026-06-17 |
-| Capture method | Manually transcribed / curated reference table (not an automated export in this repo) |
-| Upstream URL | TODO: add exact upstream URL |
+| Upstream URL | https://cursor.com/cursorbench |
+| Capture method | Manually transcribed from the public CursorBench 3.1 leaderboard (not an automated export in this repo) |
 
 ## Composer 2.5 anchor row
 

@@ -1,0 +1,49 @@
+{
+  "pair_count": 14,
+  "method_count": 6,
+  "disclaimer": "Diagnostic only: tests recovery of held-out overlap DeepSWE scores. Does not prove Composer 2.5 estimate correctness.",
+  "methods": {
+    "equipercentile_mapping": {
+      "n_valid": 14,
+      "mean_absolute_error": 6.719456498217556,
+      "median_absolute_error": 6.773315180394823,
+      "rmse": 7.7799812810595075,
+      "mean_signed_error": -0.04781354338876501
+    },
+    "ols_regression": {
+      "n_valid": 14,
+      "mean_absolute_error": 5.112156758969197,
+      "median_absolute_error": 4.199735811631582,
+      "rmse": 6.315469896392278,
+      "mean_signed_error": -0.06378834026031933
+    },
+    "robust_median_delta": {
+      "n_valid": 14,
+      "mean_absolute_error": 7.315627954123532,
+      "median_absolute_error": 6.737315634218287,
+      "rmse": 8.655430101747305,
+      "mean_signed_error": 0.7625431373219005
+    },
+    "family_adjusted": {
+      "n_valid": 14,
+      "mean_absolute_error": 9.164679787246156,
+      "median_absolute_error": 9.72425157458343,
+      "rmse": 10.934785936146978,
+      "mean_signed_error": 6.219113962255554
+    },
+    "robust_regression_theil_sen": {
+      "n_valid": 14,
+      "mean_absolute_error": 4.627887382938144,
+      "median_absolute_error": 4.2282478609705585,
+      "rmse": 5.570697300043906,
+      "mean_signed_error": -0.0523033360045425
+    },
+    "knn_inverse_distance": {
+      "n_valid": 14,
+      "mean_absolute_error": 6.523427582218188,
+      "median_absolute_error": 5.756239431748671,
+      "rmse": 7.630832119089716,
+      "mean_signed_error": 0.7487375474635584
+    }
+  }
+}

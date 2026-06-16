@@ -57,13 +57,9 @@ When the committed `trials.json` and CursorBench reference are used, the linking
 
 `scripts/loo_validation.py` holds out each overlap pair and tests whether the remaining pairs recover that model's DeepSWE score from its CursorBench score. This is **diagnostic only** — it does not validate Composer directly.
 
-After `bash scripts/run_full.sh`, run:
+See [`results/pinned/loo_validation_summary.json`](results/pinned/loo_validation_summary.json) for the committed diagnostic summary (n=14 held-out overlap pairs). Mean absolute error ranges from **4.6 pp** (`robust_regression_theil_sen`) to **9.2 pp** (`family_adjusted`). This measures overlap-pair recovery only — not Composer estimate accuracy.
 
-```bash
-python scripts/loo_validation.py
-```
-
-See `results/loo_validation_summary.json` for per-method mean absolute error on held-out overlap pairs (n=14). With current artifacts, mean absolute error ranges from ~4.6 pp (`robust_regression_theil_sen`) to ~9.2 pp (`family_adjusted`). This measures overlap-pair recovery only — not Composer estimate accuracy.
+Regenerate locally with `python scripts/loo_validation.py` after `bash scripts/run_full.sh`; compare to the pinned snapshot.
 
 ## Source provenance
 
@@ -71,9 +67,9 @@ See `results/loo_validation_summary.json` for per-method mean absolute error on 
 | --- | --- | --- |
 | DeepSWE trials | `data/raw/trials.json` | SHA-256 in [`data/raw/MANIFEST.json`](data/raw/MANIFEST.json) |
 | CursorBench 3.1 reference | `data/raw/cursorbench_3_1_reference.csv` | [`data/raw/CURSORBENCH_SOURCE.md`](data/raw/CURSORBENCH_SOURCE.md) |
-| Pinned headline outputs | `results/pinned/` | Committed snapshot for README numbers |
+| Pinned headline outputs | `results/pinned/` | Committed snapshot for README numbers and LOO diagnostics |
 
-CursorBench upstream URL: **TODO** (see `CURSORBENCH_SOURCE.md`). Refresh CursorBench and DeepSWE artifacts deliberately, then rerun the pipeline and update pinned outputs.
+CursorBench upstream: [cursor.com/cursorbench](https://cursor.com/cursorbench) (see `CURSORBENCH_SOURCE.md`). Refresh CursorBench and DeepSWE artifacts deliberately, then rerun the pipeline and update pinned outputs.
 
 ## Repository structure
 

@@ -88,7 +88,7 @@ For each overlap model-effort pair:
 3. Predict the held-out model's DeepSWE pass rate from its CursorBench score.
 4. Compare predicted vs actual DeepSWE score and summarize error metrics.
 
-Outputs: `results/loo_validation.csv`, `results/loo_validation_summary.json`, `figures/loo_validation_errors.png`.
+Outputs: `results/loo_validation.csv`, `results/loo_validation_summary.json`, `figures/loo_validation_errors.png` (regenerated locally). Committed snapshot: `results/pinned/loo_validation.csv`, `results/pinned/loo_validation_summary.json`.
 
 This tests **internal consistency** of linking methods on models that appear on both benchmarks. It does **not** validate Composer 2.5 directly (Composer is not in the overlap set) and must not be read as a confidence interval for the headline estimate.
 
@@ -98,7 +98,7 @@ This tests **internal consistency** of linking methods on models that appear on 
 2. **Larger overlap** — more models evaluated on both benchmarks under matched harness settings.
 3. **Matched cost accounting** — measured DeepSWE spend for Composer, not CursorBench proxy.
 4. **Version pinning** — explicit Composer build, harness commit, and trial artifact fingerprints in every report.
-5. **Held-out validation** — reserve overlap pairs to score linking error.
+5. **External validation** — LOO validation is included as an internal diagnostic on existing overlap pairs. Future model-effort rows that were not available when designing the methods would provide a stronger external check.
 
 ## Reproducibility
 
