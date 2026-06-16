@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import os
-import textwrap
 from pathlib import Path
 
 import numpy as np
@@ -46,17 +45,6 @@ _FALLBACK_COLORS = [
     "#937860", "#da8bc3", "#8c8c8c", "#ccb974", "#64b5cd",
 ]
 
-METHOD_LABELS = {
-    "direct_ratio_scaling": "Direct ratio",
-    "linear_interpolation": "Equipercentile",
-    "ols_regression": "OLS regression",
-    "robust_median_ratio": "Median delta",
-    "cost_normalized": "Cost-weighted",
-    "family_adjusted": "Family-adjusted",
-    "robust_regression_theil_sen": "Theil-Sen",
-    "knn_inverse_distance": "kNN (k=3)",
-}
-
 
 def _setup_matplotlib(output_dir: Path):
     mpl_dir = output_dir / ".mplconfig"
@@ -94,7 +82,102 @@ def _chart_deepswe_df(deepswe: pd.DataFrame) -> pd.DataFrame:
     return deepswe.loc[deepswe["pass_rate"] >= floor - 1e-9].copy()
 
 
-def _plot_deepswe_model_points(ax, deepswe: pd.DataFrame, *, point_size: float = 60) -> None:
+def _format_effort_tag(effort_norm: str) -> str:
+    if effort_norm == "default":
+        return ""
+    return f"[{effort_norm}]"
+
+
+def _format_full_model_effort(model_norm: str, effort_norm: str) -> str:
+    tag = _format_effort_tag(effort_norm)
+    if not tag:
+        return model_norm
+    return f"{model_norm} {tag}"
+
+
+def _tiered_effort_annotate_map(deepswe: pd.DataFrame) -> dict[tuple[str, str], str]:
+    effort_counts = deepswe.groupby("model_norm").size()
+    multi_effort_models = {str(model) for model, count in effort_counts.items() if count > 1}
+    annotate: dict[tuple[str, str], str] = {}
+    for model, grp in deepswe.groupby("model_norm", sort=False):
+        model_str = str(model)
+        if model_str not in multi_effort_models:
+            continue
+        ranked = grp.copy()
+        ranked["_effort_rank"] = ranked["effort_norm"].astype(str).map(_effort_sort_key)
+        top_effort = str(ranked.loc[ranked["_effort_rank"].idxmin(), "effort_norm"])
+        for _, row in ranked.iterrows():
+            effort = str(row["effort_norm"])
+            key = (model_str, effort)
+            if effort == top_effort:
+                annotate[key] = _format_full_model_effort(model_str, effort)
+            else:
+                annotate[key] = _format_effort_tag(effort) or effort
+    return annotate
+
+
+def _low_score_model_annotate_map(
+    deepswe: pd.DataFrame,
+    *,
+    min_score: float = 0.0,
+    max_score: float = 30.0,
+    skip_keys: set[tuple[str, str]] | None = None,
+) -> dict[tuple[str, str], str]:
+    skip_keys = skip_keys or set()
+    annotate: dict[tuple[str, str], str] = {}
+    for _, row in deepswe.iterrows():
+        score = float(row["pass_rate"])
+        if score <= min_score or score > max_score:
+            continue
+        key = (str(row["model_norm"]), str(row["effort_norm"]))
+        if key in skip_keys:
+            continue
+        annotate[key] = _format_full_model_effort(str(row["model_norm"]), str(row["effort_norm"]))
+    return annotate
+
+
+def _chart_label_map(deepswe: pd.DataFrame) -> tuple[dict[tuple[str, str], str], dict[tuple[str, str], float]]:
+    labels = _tiered_effort_annotate_map(deepswe)
+    labels[("gpt-5.4", "xhigh")] = _format_full_model_effort("gpt-5.4", "xhigh")
+    labels[("claude-sonnet-4.6", "high")] = _format_full_model_effort("claude-sonnet-4.6", "high")
+    low_score_labels = _low_score_model_annotate_map(deepswe, skip_keys=set(labels))
+    labels.update(low_score_labels)
+    font_sizes = {key: 8.0 for key in low_score_labels}
+    font_sizes[("claude-sonnet-4.6", "high")] = 8.0
+    return labels, font_sizes
+
+
+def _chart_annotate_offsets() -> dict[tuple[str, str], tuple[float, float]]:
+    return {
+        ("claude-opus-4.8", "medium"): (0, -14),
+        ("qwen3.7-max", "default"): (6, -4),
+    }
+
+
+def _chart_estimate_bounds(estimates: pd.DataFrame) -> tuple[float, float, float]:
+    """Star = core-method mean; bar = conservative median-delta to optimistic kNN."""
+    by_method = estimates.set_index("method_name")["estimated_pass_rate"]
+    core = estimates[~estimates["method_name"].isin(["direct_ratio_scaling", "cost_normalized"])]
+    y_mean = float(core["estimated_pass_rate"].mean())
+    y_lo = float(by_method.get("robust_median_ratio", estimates["estimated_pass_rate"].min()))
+    y_hi = float(by_method.get("knn_inverse_distance", estimates["estimated_pass_rate"].max()))
+    return y_mean, y_lo, y_hi
+
+
+def _plot_deepswe_model_points(
+    ax,
+    deepswe: pd.DataFrame,
+    *,
+    point_size: float = 60,
+    annotate: dict[tuple[str, str], str] | None = None,
+    annotate_fontsize: float = 9,
+    annotate_offsets: dict[tuple[str, str], tuple[float, float]] | None = None,
+    annotate_fontsizes: dict[tuple[str, str], float] | None = None,
+) -> None:
+    annotate = annotate or {}
+    annotate_offsets = annotate_offsets or {}
+    annotate_fontsizes = annotate_fontsizes or {}
+    label_bbox = dict(boxstyle="round,pad=0.25", facecolor="white", edgecolor="none", alpha=0.95)
     for model_norm, grp in deepswe.groupby("model_norm", sort=False):
         color = _model_color(str(model_norm))
         subset = grp.copy()
@@ -120,6 +203,26 @@ def _plot_deepswe_model_points(ax, deepswe: pd.DataFrame, *, point_size: float =
             linewidths=0.6,
             zorder=2,
         )
+        for _, row in subset.iterrows():
+            key = (str(row["model_norm"]), str(row["effort_norm"]))
+            if key not in annotate:
+                continue
+            xytext = annotate_offsets.get(key, (6, 6))
+            ha = "center" if xytext[0] == 0 else "left"
+            va = "top" if xytext[1] < 0 else "bottom"
+            fontsize = annotate_fontsizes.get(key, annotate_fontsize)
+            ax.annotate(
+                annotate[key],
+                (row["cost_usd"], row["pass_rate"]),
+                textcoords="offset points",
+                xytext=xytext,
+                fontsize=fontsize,
+                color=color,
+                ha=ha,
+                va=va,
+                bbox=label_bbox,
+                zorder=6,
+            )
 
 
 def _plot_composer_range_marker(
@@ -132,6 +235,7 @@ def _plot_composer_range_marker(
     cap_fraction: float = 0.01,
     label_range: bool = False,
     label_fontsize: float = 9,
+    label_offset_x: float = -10,
 ) -> None:
     xlim = ax.get_xlim()
     cap = abs(xlim[1] - xlim[0]) * cap_fraction
@@ -144,7 +248,7 @@ def _plot_composer_range_marker(
                 f"{y_val:.1f}%",
                 (x, y_val),
                 textcoords="offset points",
-                xytext=(-10, 0),
+                xytext=(label_offset_x, 0),
                 fontsize=label_fontsize,
                 ha="right",
                 va="center",
@@ -157,105 +261,99 @@ def plot_readme_chart(
     estimates: pd.DataFrame,
     out_path: Path,
 ) -> None:
-    """Primary publication chart for README and reports."""
+    """Primary publication chart for README — matches the wide annotated scatter style."""
     plt = _setup_matplotlib(out_path.parent)
     deepswe = normalized[normalized["benchmark_name"] == "deepswe"].copy()
     if deepswe.empty:
         raise ValueError("No DeepSWE rows available for README chart.")
 
     plot_df = _chart_deepswe_df(deepswe)
-    summary = summarize_uncertainty(estimates)
-    y_mean = summary["mean_estimate_pass_rate"]
-    y_lo = summary["min_estimate_pass_rate"]
-    y_hi = summary["max_estimate_pass_rate"]
+    effort_labels, label_fontsizes = _chart_label_map(plot_df)
+    y_mean, y_lo, y_hi = _chart_estimate_bounds(estimates)
 
-    fig = plt.figure(figsize=(19, 10))
-    gs = fig.add_gridspec(1, 2, width_ratios=[1.45, 0.55], wspace=0.06)
-    ax = fig.add_subplot(gs[0, 0])
-    ax_tbl = fig.add_subplot(gs[0, 1])
-    ax_tbl.axis("off")
-
-    _plot_deepswe_model_points(ax, plot_df, point_size=60)
-
-    ax.set_xlabel("Average cost per task (USD)", fontsize=11)
-    ax.set_ylabel("DeepSWE Pass@1 (%)\n(equal task weight; full eval scope)", fontsize=11, labelpad=10)
-    ax.set_title(
-        "Composer 2.5 estimated from CursorBench 3.1 → DeepSWE benchmark linking",
-        fontsize=14,
-        pad=12,
+    fig, ax = plt.subplots(figsize=(16, 9))
+    _plot_deepswe_model_points(
+        ax,
+        plot_df,
+        point_size=70,
+        annotate=effort_labels,
+        annotate_fontsize=11,
+        annotate_offsets=_chart_annotate_offsets(),
+        annotate_fontsizes=label_fontsizes,
     )
+
+    ax.set_xlabel("Average cost per task (USD, cheaper →)", fontsize=14)
+    ax.set_ylabel("DeepSWE Pass@1 (%)", fontsize=14)
+    ax.set_title(
+        "Composer 2.5 estimated from CursorBench 3.1 → DeepSWE",
+        fontsize=16,
+    )
+    ax.tick_params(labelsize=12)
     ax.grid(True, alpha=0.25)
     ax.margins(x=0.04, y=0.06)
     ax.invert_xaxis()
     _format_dollar_xaxis(ax)
+
+    cost_min = float(plot_df["cost_usd"].min())
+    cost_max = float(plot_df["cost_usd"].max())
+    span = max(cost_max - cost_min, 1.0)
+    ax.set_xlim(cost_max + span * 0.06, max(0.0, cost_min - span * 0.22))
+
     _plot_composer_range_marker(
-        ax, COMPOSER_CURSOR_COST, y_lo, y_hi, label_range=True, label_fontsize=9
+        ax,
+        COMPOSER_CURSOR_COST,
+        y_lo,
+        y_hi,
+        linewidth=2.0,
+        label_range=True,
+        label_fontsize=11,
+        label_offset_x=-12,
     )
-    ax.scatter([COMPOSER_CURSOR_COST], [y_mean], marker="*", s=320, c=COMPOSER_COLOR, zorder=5)
+    ax.scatter([COMPOSER_CURSOR_COST], [y_mean], marker="*", s=420, c=COMPOSER_COLOR, zorder=5)
     ax.annotate(
-        "CursorBench cost proxy",
-        xy=(COMPOSER_CURSOR_COST, y_mean),
-        xytext=(-10, -32),
+        "Composer 2.5",
+        (COMPOSER_CURSOR_COST, y_mean),
         textcoords="offset points",
-        fontsize=9,
+        xytext=(-14, -2),
+        fontsize=12,
         color=COMPOSER_COLOR,
         ha="right",
+        va="bottom",
+    )
+    ax.annotate(
+        f"({y_mean:.1f}%)",
+        (COMPOSER_CURSOR_COST, y_mean),
+        textcoords="offset points",
+        xytext=(-14, -6),
+        fontsize=12,
+        color="#000000",
+        ha="right",
         va="top",
-        arrowprops={"arrowstyle": "->", "color": COMPOSER_COLOR, "lw": 0.9},
+    )
+    ax.annotate(
+        "CursorBench cost proxy",
+        (COMPOSER_CURSOR_COST, y_mean),
+        textcoords="offset points",
+        xytext=(-14, -22),
+        fontsize=9,
+        color="#666666",
+        ha="right",
+        va="top",
     )
 
-    from matplotlib.lines import Line2D
-
-    ax.legend(
-        handles=[
-            Line2D(
-                [0], [0], marker="o", color="w", markerfacecolor="#666666",
-                markersize=8, label="Official DeepSWE (per model)",
-            ),
-            Line2D([0], [0], linestyle="--", color="#666666", label="Effort variants"),
-            Line2D(
-                [0], [0], marker="*", color="w", markerfacecolor=COMPOSER_COLOR,
-                markersize=14, label="Composer 2.5 (unofficial estimate)",
-            ),
-        ],
-        loc="upper left",
-        fontsize=10,
+    fig.tight_layout()
+    fig.subplots_adjust(bottom=0.10)
+    fig.text(
+        0.5,
+        0.02,
+        "← more expensive     cheaper →",
+        fontsize=9,
+        ha="center",
+        va="bottom",
+        color="#888888",
     )
-
-    table_data = [
-        [
-            METHOD_LABELS.get(str(row["method_name"]), str(row["method_name"])),
-            f"{row['estimated_pass_rate']:.1f}",
-        ]
-        for _, row in estimates.iterrows()
-    ]
-    table = ax_tbl.table(
-        cellText=table_data,
-        colLabels=["Method", "Est. %"],
-        cellLoc="left",
-        colLoc="left",
-        loc="center",
-        colWidths=[0.74, 0.26],
-    )
-    table.auto_set_font_size(False)
-    table.set_fontsize(10)
-    table.scale(1.0, 1.55)
-    for (row, col), cell in table.get_celld().items():
-        cell.set_edgecolor("#cccccc")
-        if row == 0:
-            cell.set_text_props(weight="bold")
-            cell.set_facecolor("#f2f2f2")
-
-    foot = textwrap.fill(
-        "Official DeepSWE points from trials.json (Pass@1). Composer 2.5 has no DeepSWE trials; "
-        "star = linked estimate from CursorBench overlap. Composer x-axis uses CursorBench cost proxy. "
-        "Vertical bar = spread across linking methods, not a confidence interval.",
-        width=120,
-    )
-    fig.text(0.07, 0.03, foot, fontsize=9, ha="left", va="bottom")
-    fig.subplots_adjust(left=0.07, right=0.98, bottom=0.12, top=0.92, wspace=0.18)
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(out_path, dpi=120, facecolor="white")
+    fig.savefig(out_path, dpi=160, bbox_inches="tight", facecolor="white")
     plt.close(fig)
 
 

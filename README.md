@@ -19,7 +19,7 @@ Composer 2.5 CursorBench 3.1 reference: **63.2%** pass rate, **$0.55**/task cost
 
 ![Composer 2.5 DeepSWE estimate (unofficial)](figures/composer_deepswe_estimate.png)
 
-*Official DeepSWE model points from `trials.json` (Pass@1). Red star = unofficial Composer 2.5 estimate linked from CursorBench overlap. Vertical bar = spread across eight linking methods (not a confidence interval). Composer x-position uses a CursorBench cost proxy.*
+*Official DeepSWE model points from `trials.json` (Pass@1). Red star = unofficial Composer 2.5 estimate (mean across methods). Vertical bar = conservative median-delta (52.3%) to optimistic kNN (62.2%) bounds — not a confidence interval. Composer x-position uses a CursorBench cost proxy.*
 
 > **Disclaimer:** These are **estimates** from cross-benchmark linking (n≈14 overlap pairs). Composer has no public DeepSWE trials. Method spread is **not** a confidence interval. See [limitations.md](limitations.md).
 
