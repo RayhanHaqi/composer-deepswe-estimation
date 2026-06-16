@@ -12,9 +12,11 @@ from matplotlib.ticker import FuncFormatter
 from common import COMPOSER_CURSOR_COST, COMPOSER_MODEL, summarize_uncertainty
 
 COMPOSER_COLOR = "#CC0000"
-CHART_BG_COLOR = "#FAF8F4"  # warm cream, close to DeepSWE / Claude site tones
-CHART_GRID_COLOR = "#DDD6CA"
-CHART_LABEL_BG = "#FFFCF8"
+# Warm parchment cream (Claude / editorial tone — visibly off-white on GitHub README)
+CHART_BG_COLOR = "#EFE6D8"
+CHART_GRID_COLOR = "#C8BBA8"
+CHART_LABEL_BG = "#F7F1E8"
+CHART_SPINE_COLOR = "#BFB3A2"
 CHART_SCORE_FLOOR_MODEL = "gemini-3-flash-preview"
 README_CHART_NAME = "composer_deepswe_estimate.png"
 
@@ -56,6 +58,18 @@ def _setup_matplotlib(output_dir: Path):
     import matplotlib.pyplot as plt
 
     return plt
+
+
+def _configure_readme_chart_style(plt) -> None:
+    """Force cream background through matplotlib rcParams (not just axis patches)."""
+    plt.rcParams.update(
+        {
+            "figure.facecolor": CHART_BG_COLOR,
+            "axes.facecolor": CHART_BG_COLOR,
+            "savefig.facecolor": CHART_BG_COLOR,
+            "savefig.edgecolor": CHART_BG_COLOR,
+        }
+    )
 
 
 def _model_color(model_norm: str) -> str:
@@ -182,8 +196,8 @@ def _plot_deepswe_model_points(
     label_bbox = dict(
         boxstyle="round,pad=0.25",
         facecolor=CHART_LABEL_BG,
-        edgecolor="#E8E2D8",
-        alpha=0.96,
+        edgecolor=CHART_SPINE_COLOR,
+        alpha=0.98,
     )
     for model_norm, grp in deepswe.groupby("model_norm", sort=False):
         color = _model_color(str(model_norm))
@@ -270,6 +284,7 @@ def plot_readme_chart(
 ) -> None:
     """Primary publication chart for README — matches the wide annotated scatter style."""
     plt = _setup_matplotlib(out_path.parent)
+    _configure_readme_chart_style(plt)
     deepswe = normalized[normalized["benchmark_name"] == "deepswe"].copy()
     if deepswe.empty:
         raise ValueError("No DeepSWE rows available for README chart.")
@@ -291,17 +306,17 @@ def plot_readme_chart(
         annotate_fontsizes=label_fontsizes,
     )
 
-    ax.set_xlabel("Average cost per task (USD, cheaper →)", fontsize=14, color="#2F2C28")
-    ax.set_ylabel("DeepSWE Pass@1 (%)", fontsize=14, color="#2F2C28")
+    ax.set_xlabel("Average cost per task (USD, cheaper →)", fontsize=14, color="#2A241C")
+    ax.set_ylabel("DeepSWE Pass@1 (%)", fontsize=14, color="#2A241C")
     ax.set_title(
         "Composer 2.5 estimated from CursorBench 3.1 → DeepSWE",
         fontsize=16,
-        color="#1F1C18",
+        color="#1A1612",
     )
-    ax.tick_params(labelsize=12, colors="#3D3A36")
-    ax.grid(True, alpha=0.45, color=CHART_GRID_COLOR, linewidth=0.8)
+    ax.tick_params(labelsize=12, colors="#3A342C")
+    ax.grid(True, alpha=0.55, color=CHART_GRID_COLOR, linewidth=0.9)
     for spine in ax.spines.values():
-        spine.set_color("#D9D3C7")
+        spine.set_color(CHART_SPINE_COLOR)
     ax.margins(x=0.04, y=0.06)
     ax.invert_xaxis()
     _format_dollar_xaxis(ax)
@@ -362,7 +377,7 @@ def plot_readme_chart(
         fontsize=9,
         ha="center",
         va="bottom",
-        color="#888888",
+        color="#6B6258",
     )
     out_path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(
@@ -371,6 +386,7 @@ def plot_readme_chart(
         bbox_inches="tight",
         facecolor=CHART_BG_COLOR,
         edgecolor=CHART_BG_COLOR,
+        transparent=False,
     )
     plt.close(fig)
 
