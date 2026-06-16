@@ -124,7 +124,13 @@ Requirements:
 - `data/raw/trials.json` (included in repo; refresh from DeepSWE if needed)
 - Python dependencies from `requirements.txt`
 
-Then run the four scripts in order (see above). Check `results/summary.json` for the numeric range.
+Then run:
+
+```bash
+bash scripts/run_full.sh
+```
+
+Check `results/summary.json` for the numeric range. Artifact fingerprint: `data/raw/MANIFEST.json`.
 
 ## What you still need to provide
 

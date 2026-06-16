@@ -1,0 +1,14 @@
+{
+  "artifacts": [
+    {
+      "path": "data/raw/trials.json",
+      "description": "Public DeepSWE trials artifact used to recompute Pass@1",
+      "upstream_url": "https://deepswe.datacurve.ai/artifacts/trials.json",
+      "upstream_data_page": "https://deepswe.datacurve.ai/data",
+      "upstream_reported_update": "2026-06-11",
+      "committed_sha256": "668be1d9ab588caade1124726dd8153e74483a560aadb509a1cbb9d978099da4",
+      "size_bytes": 22757706,
+      "committed_date": "2026-06-17"
+    }
+  ]
+}

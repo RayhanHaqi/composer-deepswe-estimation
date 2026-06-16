@@ -49,9 +49,10 @@ With roughly **14** overlap pairs, one outlier (e.g., GPT-5.5 [xhigh] scoring hi
 
 ## Reproducibility limits
 
-- `trials.json` updates when DeepSWE publishes new rollouts.
-- Without pinning artifact hashes in your report, reproduced numbers may drift.
-- This repo intentionally does not commit large trial files.
+- `trials.json` updates when DeepSWE publishes new rollouts; refresh with the command in `data/raw/README.md`.
+- This repo commits a pinned copy of the public DeepSWE `trials.json` (~22 MB) for one-step reproduction. Fingerprint: `data/raw/MANIFEST.json`.
+- Recomputed numbers may drift after refresh unless you update the manifest and README tables.
+- The committed artifact is the public DeepSWE download. Check [deepswe.datacurve.ai/data](https://deepswe.datacurve.ai/data) for upstream terms before redistributing or citing the bundled file.
 
 ## How to cite responsibly
 

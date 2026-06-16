@@ -26,6 +26,12 @@ curl -L -o data/raw/tasks.json https://deepswe.datacurve.ai/artifacts/tasks.json
 
 Do not commit private logs or local workspace paths.
 
+## Artifact manifest
+
+Pinned upstream fingerprints live in [`MANIFEST.json`](MANIFEST.json) (SHA-256, size, source URL, dates).
+
+The committed `trials.json` is the public artifact from [DeepSWE](https://deepswe.datacurve.ai/data). Verify upstream terms before redistributing beyond this research repo.
+
 ## Synthetic vs real data
 
 - Files prefixed with `example_` are **synthetic** and only test the pipeline.

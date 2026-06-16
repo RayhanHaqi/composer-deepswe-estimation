@@ -21,6 +21,7 @@ data/raw/tasks.json
 data/raw/*.json
 !data/raw/README.md
 !data/raw/trials.json
+!data/raw/MANIFEST.json
 
 # Generated outputs (reproducible from scripts)
 data/processed/*.csv

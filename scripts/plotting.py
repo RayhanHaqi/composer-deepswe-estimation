@@ -306,7 +306,7 @@ def plot_readme_chart(
         annotate_fontsizes=label_fontsizes,
     )
 
-    ax.set_xlabel("Average cost per task (USD, cheaper →)", fontsize=14, color="#2A241C")
+    ax.set_xlabel("Average cost per task (USD)", fontsize=14, color="#2A241C")
     ax.set_ylabel("DeepSWE Pass@1 (%)", fontsize=14, color="#2A241C")
     ax.set_title(
         "Composer 2.5 estimated from CursorBench 3.1 → DeepSWE",

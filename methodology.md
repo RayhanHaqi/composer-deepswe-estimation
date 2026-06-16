@@ -93,10 +93,7 @@ Run from repository root:
 
 ```bash
 pip install -r requirements.txt
-python scripts/parse_results.py --files data/raw/cursorbench_3_1_reference.csv data/raw/trials.json
-python scripts/estimate_composer.py
-python scripts/plot_results.py
-python scripts/generate_report.py
+bash scripts/run_full.sh
 ```
 
-See `README.md` for example-data and full-data workflows.
+See `data/raw/MANIFEST.json` for the pinned `trials.json` fingerprint. See `README.md` for example-data workflows.
