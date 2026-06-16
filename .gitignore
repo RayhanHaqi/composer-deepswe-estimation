@@ -27,7 +27,6 @@ data/processed/*.csv
 !data/processed/README.md
 figures/*.png
 !figures/composer_deepswe_estimate.png
-!figures/method_estimates.png
 !figures/README.md
 results/*
 !results/README.md

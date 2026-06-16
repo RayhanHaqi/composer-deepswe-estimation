@@ -17,9 +17,18 @@ When `trials.json` from [deepswe.datacurve.ai](https://deepswe.datacurve.ai/) is
 
 Composer 2.5 CursorBench 3.1 reference: **63.2%** pass rate, **$0.55**/task cost proxy.
 
-![Per-method DeepSWE Pass@1 estimates](figures/method_estimates.png)
+| Method | Estimated DeepSWE Pass@1 |
+| --- | ---: |
+| `cost_normalized` | 48.0% |
+| `direct_ratio_scaling` | 49.6% |
+| `robust_median_ratio` | 52.3% |
+| `ols_regression` | 57.3% |
+| `linear_interpolation` | 57.8% |
+| `family_adjusted` | 57.9% |
+| `robust_regression_theil_sen` | 61.3% |
+| `knn_inverse_distance` | 62.2% |
 
-*Each linking method’s Composer 2.5 estimate. See [methodology.md](methodology.md) for assumptions.*
+*Per-method assumptions: [methodology.md](methodology.md). Re-run `bash scripts/run_full.sh` to refresh from your local `trials.json`.*
 
 ![Composer 2.5 DeepSWE estimate (unofficial)](figures/composer_deepswe_estimate.png)
 
