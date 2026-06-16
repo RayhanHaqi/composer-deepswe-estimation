@@ -256,7 +256,7 @@ def _plot_composer_range_marker(
     cap_fraction: float = 0.01,
     label_range: bool = False,
     label_fontsize: float = 9,
-    label_offset_x: float = -10,
+    label_offset_x: float = 0,
 ) -> None:
     xlim = ax.get_xlim()
     cap = abs(xlim[1] - xlim[0]) * cap_fraction
@@ -264,15 +264,15 @@ def _plot_composer_range_marker(
     ax.plot([x - cap, x + cap], [y_lo, y_lo], color="black", linewidth=linewidth, zorder=3)
     ax.plot([x - cap, x + cap], [y_hi, y_hi], color="black", linewidth=linewidth, zorder=3)
     if label_range:
-        for y_val in (y_lo, y_hi):
+        for y_val, y_off, va in ((y_lo, -8, "top"), (y_hi, 8, "bottom")):
             ax.annotate(
                 f"{y_val:.1f}%",
                 (x, y_val),
                 textcoords="offset points",
-                xytext=(label_offset_x, 0),
+                xytext=(label_offset_x, y_off),
                 fontsize=label_fontsize,
-                ha="right",
-                va="center",
+                ha="center",
+                va=va,
                 zorder=6,
             )
 
@@ -334,7 +334,7 @@ def plot_readme_chart(
         linewidth=2.0,
         label_range=True,
         label_fontsize=11,
-        label_offset_x=-12,
+        label_offset_x=6,
     )
     ax.scatter([COMPOSER_CURSOR_COST], [y_mean], marker="*", s=420, c=COMPOSER_COLOR, zorder=5)
     ax.annotate(
