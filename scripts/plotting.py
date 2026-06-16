@@ -155,12 +155,11 @@ def _chart_annotate_offsets() -> dict[tuple[str, str], tuple[float, float]]:
 
 
 def _chart_estimate_bounds(estimates: pd.DataFrame) -> tuple[float, float, float]:
-    """Star = core-method mean; bar = conservative median-delta to optimistic kNN."""
-    by_method = estimates.set_index("method_name")["estimated_pass_rate"]
+    """Star = core-method mean; bar = min–max across all linking methods."""
     core = estimates[~estimates["method_name"].isin(["direct_ratio_scaling", "cost_normalized"])]
     y_mean = float(core["estimated_pass_rate"].mean())
-    y_lo = float(by_method.get("robust_median_ratio", estimates["estimated_pass_rate"].min()))
-    y_hi = float(by_method.get("knn_inverse_distance", estimates["estimated_pass_rate"].max()))
+    y_lo = float(estimates["estimated_pass_rate"].min())
+    y_hi = float(estimates["estimated_pass_rate"].max())
     return y_mean, y_lo, y_hi
 
 
