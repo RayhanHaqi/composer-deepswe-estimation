@@ -37,7 +37,7 @@ For each model + reasoning effort:
 3. Per task, compute pass rate across rollouts.
 4. Average task pass rates with **equal task weight**.
 
-This matches the public DeepSWE leaderboard definition in our validation checks.
+This follows the filtering and aggregation rules implemented in `scripts/common.py` (`deep-swe` source, `included_in_score=true`, full eval scope when cross-bench rows exist, equal task weight). Re-run the pipeline after `trials.json` updates to confirm scores still match your artifact.
 
 ## Estimation methods
 
@@ -56,13 +56,19 @@ Each method takes overlap pairs `(cursor_score, deepswe_score)` and predicts Dee
 
 Methods are **correlated sensitivity checks**, not independent estimators.
 
+### Central estimate vs method spread
+
+- **Central estimate** — mean of six **core** linking methods (`linear_interpolation`, `ols_regression`, `robust_median_ratio`, `family_adjusted`, `robust_regression_theil_sen`, `knn_inverse_distance`). This is the red star on the README chart (~58.1% with current artifacts).
+- **Sensitivity-only methods** — `direct_ratio_scaling` and `cost_normalized` stress ratio/cost assumptions and are excluded from the central estimate.
+- **Method spread** — min and max across **all eight** methods (currently ~48.0%–62.2%). This summarizes assumption disagreement, not statistical precision.
+
 ## Final range
 
 For each method we record `estimated_pass_rate`. The published range is:
 
-- **Minimum** across methods
-- **Maximum** across methods
-- **Mean** and **median** across methods
+- **Central estimate** — mean across core methods (headline point estimate)
+- **Minimum** and **maximum** across all methods (method spread)
+- **Mean** and **median** across all methods
 - **Method count**
 
 We label this **method spread**. It is **not** a formal confidence interval unless a method supplies a statistically justified interval (e.g., OLS approximate predictive bounds in `estimates.csv`).

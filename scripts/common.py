@@ -38,6 +38,9 @@ COMPOSER_MODEL = "composer-2.5"
 COMPOSER_CURSOR_SCORE = 63.2
 COMPOSER_CURSOR_COST = 0.55
 
+# Ratio/cost sensitivity checks — excluded from the headline central estimate.
+SENSITIVITY_ONLY_METHODS = frozenset({"direct_ratio_scaling", "cost_normalized"})
+
 CURSORBENCH_REFERENCE_CSV = "cursorbench_3_1_reference.csv"
 
 SANITY_TARGETS = {
@@ -505,15 +508,24 @@ def estimate_composer_methods(
     return pd.DataFrame(rows)
 
 
+def filter_core_methods(estimates: pd.DataFrame) -> pd.DataFrame:
+    """Core linking methods used for the headline central estimate (chart star)."""
+    return estimates[~estimates["method_name"].isin(SENSITIVITY_ONLY_METHODS)].copy()
+
+
 def summarize_uncertainty(estimates: pd.DataFrame) -> dict[str, Any]:
     scores = estimates["estimated_pass_rate"].dropna().to_numpy(dtype=float)
     costs = estimates["estimated_cost_usd"].dropna().to_numpy(dtype=float)
+    core = filter_core_methods(estimates)
+    core_scores = core["estimated_pass_rate"].dropna().to_numpy(dtype=float)
     return {
         "min_estimate_pass_rate": float(np.min(scores)),
         "max_estimate_pass_rate": float(np.max(scores)),
         "mean_estimate_pass_rate": float(np.mean(scores)),
         "median_estimate_pass_rate": float(np.median(scores)),
+        "core_mean_estimate_pass_rate": float(np.mean(core_scores)),
         "method_count": int(len(scores)),
+        "core_method_count": int(len(core_scores)),
         "min_estimate_cost_usd": float(np.min(costs)) if len(costs) else None,
         "max_estimate_cost_usd": float(np.max(costs)) if len(costs) else None,
         "mean_estimate_cost_usd": float(np.mean(costs)) if len(costs) else None,

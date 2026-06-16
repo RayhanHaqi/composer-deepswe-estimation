@@ -78,6 +78,15 @@ def build_report(
     lo = summary["min_estimate_pass_rate"]
     hi = summary["max_estimate_pass_rate"]
     mean = summary["mean_estimate_pass_rate"]
+    core_mean = summary.get(
+        "core_mean_estimate_pass_rate",
+        float(
+            estimates.loc[
+                ~estimates["method_name"].isin({"direct_ratio_scaling", "cost_normalized"}),
+                "estimated_pass_rate",
+            ].mean()
+        ),
+    )
     n_overlap = summary.get("overlap_pair_count", "n/a")
     cursor_score = summary.get("composer_cursorbench_score", "n/a")
 
@@ -116,9 +125,10 @@ def build_report(
         "",
         f"Composer 2.5 scores **{cursor_score}%** on CursorBench 3.1 (public reference) but "
         f"has **no measured DeepSWE Pass@1**. Linking **{n_overlap}** overlapping model-effort "
-        f"pairs yields a DeepSWE pass-rate estimate cluster with **median {med:.1f}%**, "
-        f"**mean {mean:.1f}%**, and **method spread {lo:.1f}–{hi:.1f}%** "
-        f"({summary['method_count']} methods).",
+        f"pairs yields a DeepSWE pass-rate estimate cluster with **central estimate "
+        f"{core_mean:.1f}%** (mean of six core linking methods), **median {med:.1f}%** "
+        f"across all methods, **mean {mean:.1f}%** across all methods, and **method spread "
+        f"{lo:.1f}–{hi:.1f}%** ({summary['method_count']} methods).",
         "",
         "## Data sources",
         "",
@@ -135,10 +145,11 @@ def build_report(
         "",
         f"| Statistic | Pass rate (%) |",
         f"| --- | ---: |",
+        f"| Central estimate (core methods) | {core_mean:.1f} |",
         f"| Minimum across methods | {lo:.1f} |",
         f"| Maximum across methods | {hi:.1f} |",
-        f"| Mean across methods | {mean:.1f} |",
-        f"| Median across methods | {med:.1f} |",
+        f"| Mean across all methods | {mean:.1f} |",
+        f"| Median across all methods | {med:.1f} |",
         "",
         summary.get(
             "uncertainty_note",

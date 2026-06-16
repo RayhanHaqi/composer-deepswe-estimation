@@ -117,8 +117,10 @@ def main() -> int:
     print(f"Overlap pairs: {len(overlap)} → {overlap_path}")
     print(f"Method estimates: {len(estimates)} → {estimates_path}")
     print(
-        f"Summary: median={summary['median_estimate_pass_rate']:.1f}% "
-        f"range={summary['min_estimate_pass_rate']:.1f}–"
+        f"Summary: central={summary['core_mean_estimate_pass_rate']:.1f}% "
+        f"median={summary['median_estimate_pass_rate']:.1f}% "
+        f"mean_all={summary['mean_estimate_pass_rate']:.1f}% "
+        f"spread={summary['min_estimate_pass_rate']:.1f}–"
         f"{summary['max_estimate_pass_rate']:.1f}% "
         f"({summary['method_count']} methods)"
     )

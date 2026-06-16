@@ -57,7 +57,7 @@ With roughly **14** overlap pairs, one outlier (e.g., GPT-5.5 [xhigh] scoring hi
 
 Prefer language such as:
 
-> "Unofficial estimate (~58% DeepSWE Pass@1 central tendency, method spread ~52–62%) derived from CursorBench↔DeepSWE linking; not a measured DeepSWE score."
+> "Unofficial estimate (~58% DeepSWE Pass@1 central estimate from six core linking methods; mean across all eight methods ~56%; method spread 48.0–62.2%) derived from CursorBench↔DeepSWE linking; not a measured DeepSWE score."
 
 Avoid language such as:
 

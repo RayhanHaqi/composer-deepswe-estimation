@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 from matplotlib.ticker import FuncFormatter
 
-from common import COMPOSER_CURSOR_COST, COMPOSER_MODEL, summarize_uncertainty
+from common import COMPOSER_CURSOR_COST, COMPOSER_MODEL, filter_core_methods, summarize_uncertainty
 
 COMPOSER_COLOR = "#CC0000"
 # Warm parchment cream (Claude / editorial tone — visibly off-white on GitHub README)
@@ -173,7 +173,7 @@ def _chart_annotate_offsets() -> dict[tuple[str, str], tuple[float, float]]:
 
 def _chart_estimate_bounds(estimates: pd.DataFrame) -> tuple[float, float, float]:
     """Star = core-method mean; bar = min–max across all linking methods."""
-    core = estimates[~estimates["method_name"].isin(["direct_ratio_scaling", "cost_normalized"])]
+    core = filter_core_methods(estimates)
     y_mean = float(core["estimated_pass_rate"].mean())
     y_lo = float(estimates["estimated_pass_rate"].min())
     y_hi = float(estimates["estimated_pass_rate"].max())
