@@ -12,6 +12,9 @@ from matplotlib.ticker import FuncFormatter
 from common import COMPOSER_CURSOR_COST, COMPOSER_MODEL, summarize_uncertainty
 
 COMPOSER_COLOR = "#CC0000"
+CHART_BG_COLOR = "#FAF8F4"  # warm cream, close to DeepSWE / Claude site tones
+CHART_GRID_COLOR = "#DDD6CA"
+CHART_LABEL_BG = "#FFFCF8"
 CHART_SCORE_FLOOR_MODEL = "gemini-3-flash-preview"
 README_CHART_NAME = "composer_deepswe_estimate.png"
 
@@ -176,7 +179,12 @@ def _plot_deepswe_model_points(
     annotate = annotate or {}
     annotate_offsets = annotate_offsets or {}
     annotate_fontsizes = annotate_fontsizes or {}
-    label_bbox = dict(boxstyle="round,pad=0.25", facecolor="white", edgecolor="none", alpha=0.95)
+    label_bbox = dict(
+        boxstyle="round,pad=0.25",
+        facecolor=CHART_LABEL_BG,
+        edgecolor="#E8E2D8",
+        alpha=0.96,
+    )
     for model_norm, grp in deepswe.groupby("model_norm", sort=False):
         color = _model_color(str(model_norm))
         subset = grp.copy()
@@ -271,6 +279,8 @@ def plot_readme_chart(
     y_mean, y_lo, y_hi = _chart_estimate_bounds(estimates)
 
     fig, ax = plt.subplots(figsize=(16, 9))
+    fig.patch.set_facecolor(CHART_BG_COLOR)
+    ax.set_facecolor(CHART_BG_COLOR)
     _plot_deepswe_model_points(
         ax,
         plot_df,
@@ -281,14 +291,17 @@ def plot_readme_chart(
         annotate_fontsizes=label_fontsizes,
     )
 
-    ax.set_xlabel("Average cost per task (USD, cheaper →)", fontsize=14)
-    ax.set_ylabel("DeepSWE Pass@1 (%)", fontsize=14)
+    ax.set_xlabel("Average cost per task (USD, cheaper →)", fontsize=14, color="#2F2C28")
+    ax.set_ylabel("DeepSWE Pass@1 (%)", fontsize=14, color="#2F2C28")
     ax.set_title(
         "Composer 2.5 estimated from CursorBench 3.1 → DeepSWE",
         fontsize=16,
+        color="#1F1C18",
     )
-    ax.tick_params(labelsize=12)
-    ax.grid(True, alpha=0.25)
+    ax.tick_params(labelsize=12, colors="#3D3A36")
+    ax.grid(True, alpha=0.45, color=CHART_GRID_COLOR, linewidth=0.8)
+    for spine in ax.spines.values():
+        spine.set_color("#D9D3C7")
     ax.margins(x=0.04, y=0.06)
     ax.invert_xaxis()
     _format_dollar_xaxis(ax)
@@ -352,7 +365,13 @@ def plot_readme_chart(
         color="#888888",
     )
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(out_path, dpi=160, bbox_inches="tight", facecolor="white")
+    fig.savefig(
+        out_path,
+        dpi=160,
+        bbox_inches="tight",
+        facecolor=CHART_BG_COLOR,
+        edgecolor=CHART_BG_COLOR,
+    )
     plt.close(fig)
 
 
