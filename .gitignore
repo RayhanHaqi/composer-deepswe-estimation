@@ -31,6 +31,8 @@ figures/*.png
 !figures/README.md
 results/*
 !results/README.md
+!results/pinned/
+!results/pinned/**
 reports/*.md
 !reports/README.md
 

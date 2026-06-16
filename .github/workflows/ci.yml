@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt pytest
+
+      - name: Run pytest
+        run: env -u PYTHONPATH pytest -q
+
+      - name: Run synthetic pipeline
+        env:
+          MPLBACKEND: Agg
+        run: |
+          python scripts/parse_results.py --files data/raw/example_model_results.csv --output /tmp/normalized.csv
+          python scripts/estimate_composer.py --input /tmp/normalized.csv --output-dir /tmp/results
+          python scripts/plot_results.py --input /tmp/normalized.csv --estimates /tmp/results/estimates.csv --output-dir /tmp/figures
+          python scripts/generate_report.py --input /tmp/normalized.csv --estimates /tmp/results/estimates.csv --summary /tmp/results/summary.json --figures-dir /tmp/figures --output /tmp/report.md

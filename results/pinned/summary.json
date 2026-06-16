@@ -1,0 +1,19 @@
+{
+  "min_estimate_pass_rate": 48.03144002304327,
+  "max_estimate_pass_rate": 62.20465883076503,
+  "mean_estimate_pass_rate": 55.811018531453676,
+  "median_estimate_pass_rate": 57.55328285286333,
+  "core_mean_estimate_pass_rate": 58.138294783675285,
+  "method_count": 8,
+  "core_method_count": 6,
+  "min_estimate_cost_usd": 0.55,
+  "max_estimate_cost_usd": 0.6809574876672775,
+  "mean_estimate_cost_usd": 0.5663696859584098,
+  "uncertainty_label": "method_spread",
+  "uncertainty_note": "Min/max across methods summarize method disagreement, not a formal confidence interval unless a method provides a statistically justified interval.",
+  "composer_model": "composer-2.5",
+  "composer_cursorbench_score": 63.2,
+  "composer_cost_proxy_usd": 0.55,
+  "overlap_pair_count": 14,
+  "disclaimer": "Unofficial estimate. Composer 2.5 has no DeepSWE trials in public artifacts."
+}

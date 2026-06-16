@@ -41,6 +41,15 @@ COMPOSER_CURSOR_COST = 0.55
 # Ratio/cost sensitivity checks — excluded from the headline central estimate.
 SENSITIVITY_ONLY_METHODS = frozenset({"direct_ratio_scaling", "cost_normalized"})
 
+CORE_LINKING_METHODS = (
+    "equipercentile_mapping",
+    "ols_regression",
+    "robust_median_delta",
+    "family_adjusted",
+    "robust_regression_theil_sen",
+    "knn_inverse_distance",
+)
+
 CURSORBENCH_REFERENCE_CSV = "cursorbench_3_1_reference.csv"
 
 SANITY_TARGETS = {
@@ -380,6 +389,67 @@ def _family_adjusted_delta(overlap: pd.DataFrame) -> tuple[float, str]:
     return delta, f"{ref}. Reference family medians: {fam_notes}."
 
 
+def predict_linking_at_anchor(
+    overlap: pd.DataFrame,
+    cursor_score: float,
+    cursor_cost: float,
+    *,
+    methods: tuple[str, ...] | None = None,
+) -> dict[str, float]:
+    """Return per-method DeepSWE pass-rate predictions at a CursorBench anchor."""
+    if overlap.empty:
+        raise ValueError("Overlap table is empty.")
+
+    x = overlap["cursor_score"].to_numpy(dtype=float)
+    y = overlap["deepswe_score"].to_numpy(dtype=float)
+    x_cost = overlap["cursor_cost"].to_numpy(dtype=float)
+    y_cost = overlap["deepswe_cost"].to_numpy(dtype=float)
+    x0 = float(cursor_score)
+    cost0 = float(cursor_cost)
+
+    all_methods = {
+        "direct_ratio_scaling": lambda: float(
+            x0 * np.mean(y / np.maximum(x, 1e-6))
+        ),
+        "equipercentile_mapping": lambda: _equipercentile(x, y, x0),
+        "ols_regression": lambda: _ols_fit_predict(x, y, x0)[0],
+        "robust_median_delta": lambda: x0 + float(np.median(y - x)),
+        "cost_normalized": lambda: _cost_normalized_predict(x, y, x_cost, y_cost, x0, cost0)[0],
+        "family_adjusted": lambda: x0 + _family_adjusted_delta(overlap)[0],
+        "robust_regression_theil_sen": lambda: _theil_sen_predict(x, y, x0),
+        "knn_inverse_distance": lambda: _knn_inverse_distance_predict(x, y, x0),
+    }
+
+    selected = methods or tuple(all_methods.keys())
+    preds: dict[str, float] = {}
+    for name in selected:
+        if name not in all_methods:
+            raise KeyError(f"Unknown linking method: {name}")
+        if len(x) < 2 and name in {"ols_regression", "robust_regression_theil_sen"}:
+            preds[name] = float("nan")
+            continue
+        if len(x) < 3 and name == "knn_inverse_distance":
+            preds[name] = float("nan")
+            continue
+        try:
+            preds[name] = float(all_methods[name]())
+        except Exception:
+            preds[name] = float("nan")
+    return preds
+
+
+def _knn_inverse_distance_predict(x: np.ndarray, y: np.ndarray, x0: float, k: int = 3) -> float:
+    x = np.asarray(x, dtype=float)
+    y = np.asarray(y, dtype=float)
+    if len(x) == 0:
+        return float("nan")
+    dist = np.abs(x - x0)
+    order = np.argsort(dist)[: min(k, len(x))]
+    eps = 1e-6
+    w = 1.0 / np.maximum(dist[order], eps)
+    return float(np.dot(w, y[order]) / w.sum())
+
+
 def estimate_composer_methods(
     overlap: pd.DataFrame,
     *,
@@ -396,62 +466,48 @@ def estimate_composer_methods(
     x0 = composer_cursor_score
     cost0 = composer_cursor_cost
 
-    rows: list[dict[str, Any]] = []
-
+    preds = predict_linking_at_anchor(overlap, x0, cost0)
     ratio = y / np.maximum(x, 1e-6)
-    pred = float(x0 * np.mean(ratio))
-    rows.append(
-        {
-            "method_name": "direct_ratio_scaling",
-            "estimated_pass_rate": pred,
-            "estimated_cost_usd": cost0,
-            "assumptions": "DeepSWE/CursorBench pass-rate ratio is stable across overlap pairs.",
-            "notes": f"Mean ratio={np.mean(ratio):.4f} applied to Composer CursorBench {x0:.1f}%.",
-        }
-    )
-
-    pred = _equipercentile(x, y, x0)
-    rows.append(
-        {
-            "method_name": "linear_interpolation",
-            "estimated_pass_rate": pred,
-            "estimated_cost_usd": cost0,
-            "assumptions": "Equipercentile mapping between CursorBench and DeepSWE score distributions.",
-            "notes": "Also known as equipercentile equating on overlap pairs.",
-        }
-    )
-
-    pred, lo, hi = _ols_fit_predict(x, y, x0)
+    median_ratio = float(np.median(y - x))
+    pred_pass, pred_cost = _cost_normalized_predict(x, y, x_cost, y_cost, x0, cost0)
+    cost_scale = float(np.median(y_cost / np.maximum(x_cost, 1e-6)))
+    delta, fam_note = _family_adjusted_delta(overlap)
+    _, lo, hi = _ols_fit_predict(x, y, x0)
     interval_note = ""
     if lo is not None and hi is not None:
         interval_note = f" OLS approximate 95% predictive interval: {lo:.1f}–{hi:.1f}%."
-    rows.append(
+
+    rows: list[dict[str, Any]] = [
+        {
+            "method_name": "direct_ratio_scaling",
+            "estimated_pass_rate": preds["direct_ratio_scaling"],
+            "estimated_cost_usd": cost0,
+            "assumptions": "DeepSWE/CursorBench pass-rate ratio is stable across overlap pairs.",
+            "notes": f"Mean ratio={np.mean(ratio):.4f} applied to Composer CursorBench {x0:.1f}%.",
+        },
+        {
+            "method_name": "equipercentile_mapping",
+            "estimated_pass_rate": preds["equipercentile_mapping"],
+            "estimated_cost_usd": cost0,
+            "assumptions": "Equipercentile mapping between CursorBench and DeepSWE score distributions.",
+            "notes": "Equipercentile equating on overlap pairs.",
+        },
         {
             "method_name": "ols_regression",
-            "estimated_pass_rate": pred,
+            "estimated_pass_rate": preds["ols_regression"],
             "estimated_cost_usd": cost0,
             "assumptions": "Linear relationship deepswe_score ~ cursor_score on overlap.",
             "notes": f"Ordinary least squares on n={len(x)} pairs.{interval_note}",
             "lower_interval_optional": lo,
             "upper_interval_optional": hi,
-        }
-    )
-
-    median_ratio = float(np.median(y - x))
-    pred = x0 + median_ratio
-    rows.append(
+        },
         {
-            "method_name": "robust_median_ratio",
-            "estimated_pass_rate": pred,
+            "method_name": "robust_median_delta",
+            "estimated_pass_rate": preds["robust_median_delta"],
             "estimated_cost_usd": cost0,
             "assumptions": "Median Cursor→DeepSWE gap is representative for Composer.",
             "notes": f"Composer CursorBench + median delta ({median_ratio:+.2f} pp).",
-        }
-    )
-
-    pred_pass, pred_cost = _cost_normalized_predict(x, y, x_cost, y_cost, x0, cost0)
-    cost_scale = float(np.median(y_cost / np.maximum(x_cost, 1e-6)))
-    rows.append(
+        },
         {
             "method_name": "cost_normalized",
             "estimated_pass_rate": pred_pass,
@@ -464,46 +520,29 @@ def estimate_composer_methods(
                 "Inverse-distance weighted DeepSWE pass rate on normalized (score, cost) distance; "
                 f"cost uses median deepswe/cursor ratio ({cost_scale:.3f})."
             ),
-        }
-    )
-
-    delta, fam_note = _family_adjusted_delta(overlap)
-    pred = x0 + delta
-    rows.append(
+        },
         {
             "method_name": "family_adjusted",
-            "estimated_pass_rate": pred,
+            "estimated_pass_rate": preds["family_adjusted"],
             "estimated_cost_usd": cost0,
             "assumptions": "Composer behaves like frontier GPT/Opus families on cross-benchmark shift.",
             "notes": f"Composer CursorBench + family-adjusted delta ({delta:+.2f} pp). {fam_note}",
-        }
-    )
-
-    pred = _theil_sen_predict(x, y, x0)
-    rows.append(
+        },
         {
             "method_name": "robust_regression_theil_sen",
-            "estimated_pass_rate": pred,
+            "estimated_pass_rate": preds["robust_regression_theil_sen"],
             "estimated_cost_usd": cost0,
             "assumptions": "Robust linear fit reduces influence of outlier overlap pairs.",
             "notes": "Theil-Sen regression (sklearn if available).",
-        }
-    )
-
-    dist = np.abs(x - x0)
-    order = np.argsort(dist)[:3]
-    eps = 1e-6
-    w = 1.0 / np.maximum(dist[order], eps)
-    pred = float(np.dot(w, y[order]) / w.sum())
-    rows.append(
+        },
         {
             "method_name": "knn_inverse_distance",
-            "estimated_pass_rate": pred,
+            "estimated_pass_rate": preds["knn_inverse_distance"],
             "estimated_cost_usd": cost0,
             "assumptions": "Nearest CursorBench neighbors (k=3) predict Composer DeepSWE score.",
             "notes": "Sensitivity upper bound when Composer sits among top-tier Cursor rows.",
-        }
-    )
+        },
+    ]
 
     return pd.DataFrame(rows)
 

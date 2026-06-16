@@ -46,9 +46,9 @@ Each method takes overlap pairs `(cursor_score, deepswe_score)` and predicts Dee
 | Method | Idea | Main assumption |
 | --- | --- | --- |
 | `direct_ratio_scaling` | Multiply Composer score by mean pass-rate ratio | Ratio is stable across models |
-| `linear_interpolation` | Equipercentile mapping | Score distributions align by percentile |
+| `equipercentile_mapping` | Equipercentile mapping | Score distributions align by percentile |
 | `ols_regression` | Linear fit `deepswe ~ cursor` | Linear link on overlap |
-| `robust_median_ratio` | Composer + median(Cursor→DeepSWE gap) | Median gap is representative |
+| `robust_median_delta` | Composer + median(Cursor→DeepSWE gap) | Median gap is representative |
 | `cost_normalized` | Scale pass/cost and cost ratios | Cost structure transfers to Composer |
 | `family_adjusted` | Family-specific median gap | Composer behaves like its model family |
 | `robust_regression_theil_sen` | Theil-Sen robust line | Outlier pairs should be down-weighted |
@@ -58,7 +58,7 @@ Methods are **correlated sensitivity checks**, not independent estimators.
 
 ### Central estimate vs method spread
 
-- **Central estimate** — mean of six **core** linking methods (`linear_interpolation`, `ols_regression`, `robust_median_ratio`, `family_adjusted`, `robust_regression_theil_sen`, `knn_inverse_distance`). This is the red star on the README chart (~58.1% with current artifacts).
+- **Central estimate** — mean of six **core** linking methods (`equipercentile_mapping`, `ols_regression`, `robust_median_delta`, `family_adjusted`, `robust_regression_theil_sen`, `knn_inverse_distance`). This is the red star on the README chart (~58.1% with current artifacts).
 - **Sensitivity-only methods** — `direct_ratio_scaling` and `cost_normalized` stress ratio/cost assumptions and are excluded from the central estimate.
 - **Method spread** — min and max across **all eight** methods (currently ~48.0%–62.2%). This summarizes assumption disagreement, not statistical precision.
 
@@ -77,7 +77,20 @@ We label this **method spread**. It is **not** a formal confidence interval unle
 
 - **Method spread** communicates disagreement between linking assumptions.
 - Optional per-method intervals (when present) are documented in `notes` and must not be over-interpreted with n≈14 overlap pairs.
-- Leave-one-out sensitivity can be added in future work; not required for the minimal pipeline.
+- **Leave-one-out validation** (`scripts/loo_validation.py`) holds out each overlap pair and asks whether the remaining pairs recover that model's DeepSWE score from its CursorBench score. This is a **diagnostic** check on linking assumptions among overlap models — not proof that the Composer 2.5 estimate is correct.
+
+## Leave-one-out validation
+
+For each overlap model-effort pair:
+
+1. Remove that pair from the overlap set.
+2. Fit each core linking method on the remaining pairs.
+3. Predict the held-out model's DeepSWE pass rate from its CursorBench score.
+4. Compare predicted vs actual DeepSWE score and summarize error metrics.
+
+Outputs: `results/loo_validation.csv`, `results/loo_validation_summary.json`, `figures/loo_validation_errors.png`.
+
+This tests **internal consistency** of linking methods on models that appear on both benchmarks. It does **not** validate Composer 2.5 directly (Composer is not in the overlap set) and must not be read as a confidence interval for the headline estimate.
 
 ## What would improve the estimate
 

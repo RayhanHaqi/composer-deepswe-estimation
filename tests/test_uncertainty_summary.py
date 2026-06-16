@@ -21,9 +21,9 @@ def _fixture_estimates() -> pd.DataFrame:
             "method_name": [
                 "cost_normalized",
                 "direct_ratio_scaling",
-                "robust_median_ratio",
+                "robust_median_delta",
                 "ols_regression",
-                "linear_interpolation",
+                "equipercentile_mapping",
                 "family_adjusted",
                 "robust_regression_theil_sen",
                 "knn_inverse_distance",

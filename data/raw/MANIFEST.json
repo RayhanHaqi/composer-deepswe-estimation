@@ -9,6 +9,17 @@
       "committed_sha256": "668be1d9ab588caade1124726dd8153e74483a560aadb509a1cbb9d978099da4",
       "size_bytes": 22757706,
       "committed_date": "2026-06-17"
+    },
+    {
+      "path": "data/raw/cursorbench_3_1_reference.csv",
+      "description": "Public CursorBench 3.1 reference table (Composer 2.5 anchor: 63.2% pass, $0.55/task cost proxy)",
+      "upstream_url": "TODO: add exact upstream URL",
+      "capture_method": "manually transcribed reference table",
+      "committed_sha256": "604a0e35efc046aa4163b4c8035adb62975ee180d2f73ad4cda3c3aa8b4894f9",
+      "size_bytes": 1603,
+      "committed_date": "2026-06-17",
+      "provenance_doc": "data/raw/CURSORBENCH_SOURCE.md",
+      "refresh_note": "CursorBench values must be refreshed manually if the upstream leaderboard changes"
     }
   ]
 }

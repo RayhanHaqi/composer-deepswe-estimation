@@ -1,0 +1,9 @@
+method_name,estimated_pass_rate,estimated_cost_usd,assumptions,notes,lower_interval_optional,upper_interval_optional
+direct_ratio_scaling,49.62693952653445,0.55,DeepSWE/CursorBench pass-rate ratio is stable across overlap pairs.,Mean ratio=0.7852 applied to Composer CursorBench 63.2%.,,
+equipercentile_mapping,57.83817951959545,0.55,Equipercentile mapping between CursorBench and DeepSWE score distributions.,Equipercentile equating on overlap pairs.,,
+ols_regression,57.26838618613121,0.55,Linear relationship deepswe_score ~ cursor_score on overlap.,Ordinary least squares on n=14 pairs. OLS approximate 95% predictive interval: 53.1–61.5%.,53.06953705636184,61.46723531590058
+robust_median_delta,52.30619469026549,0.55,Median Cursor→DeepSWE gap is representative for Composer.,Composer CursorBench + median delta (-10.89 pp).,,
+cost_normalized,48.03144002304327,0.6809574876672775,Overlap models near Composer in both CursorBench score and cost are most informative; DeepSWE cost scales via median cost ratio.,"Inverse-distance weighted DeepSWE pass rate on normalized (score, cost) distance; cost uses median deepswe/cursor ratio (1.238).",,
+family_adjusted,57.91061946902655,0.55,Composer behaves like frontier GPT/Opus families on cross-benchmark shift.,Composer CursorBench + family-adjusted delta (-5.29 pp). median of gpt_like (-0.7pp) and opus_like (-9.9pp). Reference family medians: gpt_like=-0.7pp; opus_like=-9.9pp; sonnet_like=-17.2pp.,,
+robust_regression_theil_sen,61.301730006267945,0.55,Robust linear fit reduces influence of outlier overlap pairs.,Theil-Sen regression (sklearn if available).,,
+knn_inverse_distance,62.20465883076503,0.55,Nearest CursorBench neighbors (k=3) predict Composer DeepSWE score.,Sensitivity upper bound when Composer sits among top-tier Cursor rows.,,
