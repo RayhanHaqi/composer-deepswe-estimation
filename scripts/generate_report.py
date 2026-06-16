@@ -83,6 +83,7 @@ def build_report(
 
     bench_counts = normalized["benchmark_name"].value_counts().to_dict()
     figure_names = [
+        "composer_deepswe_estimate.png",
         "cost_vs_pass_rate.png",
         "method_estimates.png",
         "composer_vs_models.png",

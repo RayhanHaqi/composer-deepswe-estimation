@@ -26,6 +26,7 @@ data/raw/*.json
 data/processed/*.csv
 !data/processed/README.md
 figures/*.png
+!figures/composer_deepswe_estimate.png
 !figures/README.md
 results/*
 !results/README.md

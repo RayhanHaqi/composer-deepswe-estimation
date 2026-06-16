@@ -17,6 +17,10 @@ When `trials.json` from [deepswe.datacurve.ai](https://deepswe.datacurve.ai/) is
 
 Composer 2.5 CursorBench 3.1 reference: **63.2%** pass rate, **$0.55**/task cost proxy.
 
+![Composer 2.5 DeepSWE estimate (unofficial)](figures/composer_deepswe_estimate.png)
+
+*Official DeepSWE model points from `trials.json` (Pass@1). Red star = unofficial Composer 2.5 estimate linked from CursorBench overlap. Vertical bar = spread across eight linking methods (not a confidence interval). Composer x-position uses a CursorBench cost proxy.*
+
 > **Disclaimer:** These are **estimates** from cross-benchmark linking (n≈14 overlap pairs). Composer has no public DeepSWE trials. Method spread is **not** a confidence interval. See [limitations.md](limitations.md).
 
 ## Repository structure
@@ -43,7 +47,7 @@ composer-deepswe-estimation/
 ## Setup
 
 ```bash
-git clone <your-repo-url> composer-deepswe-estimation
+git clone https://github.com/RayhanHaqi/composer-deepswe-estimation.git
 cd composer-deepswe-estimation
 python -m venv .venv
 source .venv/bin/activate
