@@ -17,6 +17,10 @@ When `trials.json` from [deepswe.datacurve.ai](https://deepswe.datacurve.ai/) is
 
 Composer 2.5 CursorBench 3.1 reference: **63.2%** pass rate, **$0.55**/task cost proxy.
 
+![Per-method DeepSWE Pass@1 estimates](figures/method_estimates.png)
+
+*Each linking method’s Composer 2.5 estimate. See [methodology.md](methodology.md) for assumptions.*
+
 ![Composer 2.5 DeepSWE estimate (unofficial)](figures/composer_deepswe_estimate.png)
 
 *Official DeepSWE model points from `trials.json` (Pass@1). Red star = unofficial Composer 2.5 estimate (mean across core linking methods, ~58%). Vertical bar = **method spread** min–max across all eight methods (~48.0%–62.2%) — not a confidence interval. Composer x-position uses a CursorBench cost proxy.*
