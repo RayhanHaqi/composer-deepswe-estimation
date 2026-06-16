@@ -106,7 +106,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-For exact reproduction, prefer the pinned versions in `requirements-lock.txt` once generated.
+For exact reproduction, prefer the pinned versions in `requirements-lock.txt`.
 
 ## Reproduce the headline numbers
 
