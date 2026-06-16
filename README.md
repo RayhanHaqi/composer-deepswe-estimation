@@ -6,7 +6,7 @@ This repository provides a reproducible, unofficial estimation of Composer 2.5 p
 
 ## Key result (with public DeepSWE trials)
 
-When `trials.json` from [deepswe.datacurve.ai](https://deepswe.datacurve.ai/) is provided locally, the current linking pipeline yields approximately:
+When the included public `trials.json` from [deepswe.datacurve.ai](https://deepswe.datacurve.ai/) is used, the current linking pipeline yields approximately:
 
 | Statistic | Estimated DeepSWE Pass@1 |
 | --- | ---: |
@@ -83,14 +83,9 @@ python scripts/generate_report.py --input data/processed/normalized_results.csv 
 
 ### 2) Full estimate with public DeepSWE artifacts
 
-If `data/raw/trials.json` is not present, download it (~22 MB) or symlink from an existing copy (e.g. `../deepswe/trials.json`):
+`data/raw/trials.json` (~22 MB) is **included in this repository** for reproducibility. `tasks.json` is optional and not committed.
 
-```bash
-ln -sf ../deepswe/trials.json data/raw/trials.json
-ln -sf ../deepswe/tasks.json data/raw/tasks.json
-```
-
-Or download:
+To refresh from DeepSWE if the public artifact updates:
 
 ```bash
 curl -L -o data/raw/trials.json https://deepswe.datacurve.ai/artifacts/trials.json
@@ -126,7 +121,7 @@ Details: [methodology.md](methodology.md)
 Requirements:
 
 - `data/raw/cursorbench_3_1_reference.csv` (included)
-- `data/raw/trials.json` (download from DeepSWE)
+- `data/raw/trials.json` (included in repo; refresh from DeepSWE if needed)
 - Python dependencies from `requirements.txt`
 
 Then run the four scripts in order (see above). Check `results/summary.json` for the numeric range.
@@ -136,7 +131,7 @@ Then run the four scripts in order (see above). Check `results/summary.json` for
 | Item | Status in repo |
 | --- | --- |
 | CursorBench 3.1 reference table | Included (`cursorbench_3_1_reference.csv`) |
-| DeepSWE `trials.json` | **Use local copy** (symlink/download; not committed) |
+| DeepSWE `trials.json` | **Included** in `data/raw/` (~22 MB) |
 | Official Composer 2.5 DeepSWE trials | **Not available** — estimate only |
 | Pinning harness/build versions | Document in your fork if you publish |
 

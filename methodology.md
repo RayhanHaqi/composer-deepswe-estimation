@@ -25,7 +25,7 @@ Estimation links benchmarks through **overlap pairs**: models with the same norm
 | Source | Role | Official? |
 | --- | --- | --- |
 | `cursorbench_3_1_reference.csv` | CursorBench 3.1 pass rate and cost proxy | Public reference table |
-| `trials.json` (user download) | DeepSWE rollouts recomputed to Pass@1 | Public DeepSWE artifact |
+| `trials.json` | DeepSWE rollouts recomputed to Pass@1 | Public DeepSWE artifact (included in repo) |
 | `example_model_results.csv` | Synthetic pipeline test only | **Not real** |
 
 ### DeepSWE Pass@1 definition
