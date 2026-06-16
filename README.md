@@ -4,12 +4,6 @@
 
 This repository provides a reproducible, unofficial estimation of Composer 2.5 performance on DeepSWE-style coding-agent benchmarks. The estimate is derived from available benchmark mappings and multiple transparent estimation methods. It should **not** be interpreted as an official benchmark submission.
 
-![Composer 2.5 DeepSWE estimate (unofficial)](figures/composer_deepswe_estimate.png)
-
-*Official DeepSWE model points from `trials.json` (Pass@1). Red star = unofficial Composer 2.5 **central estimate** (mean of six core linking methods, ~58.1%). Vertical bar = **method spread** min–max across all eight methods (~48.0%–62.2%) — not a confidence interval. Composer x-position uses a CursorBench cost proxy.*
-
-> **Disclaimer:** These are **estimates** from cross-benchmark linking (n≈14 overlap pairs). Composer has no public DeepSWE trials. Method spread is **not** a confidence interval. See [limitations.md](limitations.md).
-
 ## Key result (with public DeepSWE trials)
 
 When `trials.json` from [deepswe.datacurve.ai](https://deepswe.datacurve.ai/) is provided locally, the current linking pipeline yields approximately:
@@ -25,6 +19,12 @@ When `trials.json` from [deepswe.datacurve.ai](https://deepswe.datacurve.ai/) is
 *Core methods exclude `direct_ratio_scaling` and `cost_normalized` (ratio/cost sensitivity checks). Method spread is sensitivity disagreement across all eight methods — not a confidence interval.*
 
 Composer 2.5 CursorBench 3.1 reference: **63.2%** pass rate, **$0.55**/task cost proxy.
+
+![Composer 2.5 DeepSWE estimate (unofficial)](figures/composer_deepswe_estimate.png)
+
+*Official DeepSWE model points from `trials.json` (Pass@1). Red star = unofficial Composer 2.5 **central estimate** (mean of six core linking methods, ~58.1%). Vertical bar = **method spread** min–max across all eight methods (~48.0%–62.2%) — not a confidence interval. Composer x-position uses a CursorBench cost proxy.*
+
+> **Disclaimer:** These are **estimates** from cross-benchmark linking (n≈14 overlap pairs). Composer has no public DeepSWE trials. Method spread is **not** a confidence interval. See [limitations.md](limitations.md).
 
 | Method | Estimated DeepSWE Pass@1 |
 | --- | ---: |
