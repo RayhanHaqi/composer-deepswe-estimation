@@ -1,0 +1,8 @@
+model_name,model_norm,effort_norm,benchmark_name,pass_rate,cost_usd,num_tasks,num_completed,num_failed,num_errored,source,is_official,notes
+SYNTHETIC — example only,SYNTHETIC-alpha,default,cursorbench,60.0,5.0,,,,,synthetic_example,false,Example row for pipeline testing only
+SYNTHETIC — example only,SYNTHETIC-beta,default,cursorbench,50.0,3.0,,,,,synthetic_example,false,Example row for pipeline testing only
+SYNTHETIC — example only,SYNTHETIC-gamma,default,cursorbench,40.0,2.0,,,,,synthetic_example,false,Example row for pipeline testing only
+SYNTHETIC — example only,SYNTHETIC-alpha,default,deepswe,55.0,6.0,10,10,4,0,synthetic_example,false,Example row for pipeline testing only
+SYNTHETIC — example only,SYNTHETIC-beta,default,deepswe,45.0,4.0,10,10,5,0,synthetic_example,false,Example row for pipeline testing only
+SYNTHETIC — example only,SYNTHETIC-gamma,default,deepswe,35.0,2.5,10,10,6,0,synthetic_example,false,Example row for pipeline testing only
+Composer 2.5 (synthetic anchor),composer-2.5,default,cursorbench,58.0,1.0,,,,,synthetic_example,false,Synthetic Composer anchor for example pipeline only

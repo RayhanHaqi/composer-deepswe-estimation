@@ -1,0 +1,29 @@
+rank,model_raw,model_norm,effort_norm,score,avg_cost,tokens,steps
+1,Fable 5 Max,fable-5,max,72.9,18.02,63842,76
+2,Fable 5 Extra High,fable-5,xhigh,72.0,13.74,48754,63
+3,Fable 5 High,fable-5,high,70.6,10.81,37173,54
+4,Fable 5 Medium,fable-5,medium,69.8,8.27,28507,47
+5,Opus 4.7 Max,claude-opus-4.7,max,64.8,11.02,62989,96
+6,GPT-5.5 Extra High,gpt-5.5,xhigh,64.3,4.37,17905,46
+7,Fable 5 Low,fable-5,low,64.2,5.70,18882,36
+8,Opus 4.8 Max,claude-opus-4.8,max,63.8,7.59,77370,60
+9,Composer 2.5,composer-2.5,default,63.2,0.55,15152,37
+10,GPT-5.5 High,gpt-5.5,high,62.6,3.59,13329,40
+11,Opus 4.8 Extra High,claude-opus-4.8,xhigh,62.1,6.14,55622,54
+12,Opus 4.7 Extra High,claude-opus-4.7,xhigh,61.6,7.11,43942,72
+13,Opus 4.7 High,claude-opus-4.7,high,59.4,5.01,32227,59
+14,GPT-5.5 Medium,gpt-5.5,medium,59.2,2.22,9065,35
+15,Opus 4.8 High,claude-opus-4.8,high,58.4,4.41,36788,45
+16,Opus 4.8 Medium,claude-opus-4.8,medium,56.6,3.83,31684,41
+17,Opus 4.8 Low,claude-opus-4.8,low,54.3,2.93,22726,36
+18,Opus 4.7 Medium,claude-opus-4.7,medium,52.7,2.93,19193,41
+19,Composer 2,composer-2,default,52.2,0.56,14163,40
+20,Gemini 3.5 Flash,gemini-3.5-flash,medium,49.8,1.94,35105,79
+21,Sonnet 4.6 Max,claude-sonnet-4.6,max,49.0,3.09,40280,55
+22,GPT-5.5 Low,gpt-5.5,low,48.8,1.19,4923,24
+23,Sonnet 4.6 High,claude-sonnet-4.6,high,48.8,3.06,37352,57
+24,Opus 4.7 Low,claude-opus-4.7,low,48.3,1.87,13164,29
+25,Kimi 2.6,kimi-k2.6,default,47.6,1.27,24783,56
+26,Sonnet 4.6 Medium,claude-sonnet-4.6,medium,46.0,2.64,31360,50
+27,Sonnet 4.6 Low,claude-sonnet-4.6,low,41.5,1.89,21211,50
+28,Kimi 2.5,kimi-k2.5,default,31.9,0.87,9446,30

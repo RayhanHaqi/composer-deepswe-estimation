@@ -1,0 +1,46 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Data artifacts (large or local)
+data/raw/trials.json
+data/raw/tasks.json
+data/raw/*.json
+!data/raw/README.md
+
+# Generated outputs (reproducible from scripts)
+data/processed/*.csv
+!data/processed/README.md
+figures/*.png
+!figures/README.md
+results/*
+!results/README.md
+reports/*.md
+!reports/README.md
+
+# Matplotlib cache
+.mplconfig/
+**/.mplconfig/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets
+.env
+*.pem
+*.key
